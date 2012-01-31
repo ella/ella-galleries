@@ -134,4 +134,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['galleries']
+    complete_apps = ['ella_galleries']
