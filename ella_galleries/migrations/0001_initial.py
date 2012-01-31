@@ -1,10 +1,12 @@
 
 from south.db import db
 from django.db import models
+from south.v2 import SchemaMigration
 from ella_galleries.models import *
 import datetime
+from ella.core.models import Publishable
 
-class Migration:
+class Migration(SchemaMigration):
 
     depends_on = (
         ("core", "0001_initial"),
@@ -12,6 +14,14 @@ class Migration:
     )
 
     def forwards(self, orm):
+
+        # Adding model 'Gallery'
+        db.create_table('galleries_gallery', (
+            ('publishable_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=Publishable, unique=True, primary_key=True)),
+            ('content', models.TextField(_('Content'), blank=True)),
+            ('created', models.DateTimeField(_('Created'), default=datetime.datetime.now, editable=False)),
+        ))
+        db.send_create_signal('ella_galleries', ['Gallery'])
 
         # Adding model 'GalleryItem'
         db.create_table('galleries_galleryitem', (
@@ -22,19 +32,6 @@ class Migration:
             ('order', models.IntegerField(_('Object order'))),
         ))
         db.send_create_signal('ella_galleries', ['GalleryItem'])
-
-        # Adding model 'Gallery'
-        db.create_table('galleries_gallery', (
-            ('id', models.AutoField(primary_key=True)),
-            ('title', models.CharField(_('Title'), max_length=255)),
-            ('slug', models.SlugField(_('Slug'), max_length=255)),
-            ('description', models.CharField(_('Description'), max_length=3000, blank=True)),
-            ('content', models.TextField(_('Content'), blank=True)),
-            ('owner', models.ForeignKey(orm['core.Author'], null=True, verbose_name=_('Gallery owner'), blank=True)),
-            ('category', models.ForeignKey(orm['core.Category'], null=True, verbose_name=_('Category'), blank=True)),
-            ('created', models.DateTimeField(_('Created'), default=datetime.datetime.now, editable=False)),
-        ))
-        db.send_create_signal('ella_galleries', ['Gallery'])
 
         # Creating unique_together for [gallery, order] on GalleryItem.
         db.create_unique('galleries_galleryitem', ['gallery_id', 'order'])
