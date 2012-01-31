@@ -7,13 +7,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.rename_table('galleries_gallery', 'ellagalleries_gallery')
-        db.rename_table('galleries_galleryitem', 'ellagalleries_galleryitem')
+        db.rename_table('galleries_gallery', 'ella_galleries_gallery')
+        db.rename_table('galleries_galleryitem', 'ella_galleries_galleryitem')
 
 
     def backwards(self, orm):
-        db.rename_table('ellagalleries_gallery', 'galleries_gallery')
-        db.rename_table('ellagalleries_galleryitem', 'galleries_galleryitem')
+        db.rename_table('ella_galleries_gallery', 'galleries_gallery')
+        db.rename_table('ella_galleries_galleryitem', 'galleries_galleryitem')
 
 
     models = {
