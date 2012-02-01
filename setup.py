@@ -18,6 +18,7 @@ setup(
 
     packages=find_packages(
         where='.',
+        exclude=('doc', 'test_ella_galleries')
     ),
 
     include_package_data=True,
