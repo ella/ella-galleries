@@ -1,6 +1,5 @@
 from django.http import Http404
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.template.response import TemplateResponse
 from django.utils.translation import ungettext
 from django.utils.cache import patch_vary_headers
 
@@ -57,10 +56,10 @@ def gallery_item_detail(request, context, item_slug=None):
     else:
         template_name = "item.html"
 
-    response = render_to_response(
+    response = TemplateResponse(
+        request,
         get_templates_from_publishable(template_name, context['object']),
         context,
-        context_instance=RequestContext(request),
     )
 
     patch_vary_headers(response, ('X-Requested-With',))
