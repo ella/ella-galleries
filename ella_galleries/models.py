@@ -8,7 +8,7 @@ from ella.core.custom_urls import resolver
 from ella.photos.models import Photo
 
 
-def get_gallery_key(func, gallery):
+def get_gallery_key(gallery):
     return 'ella_galleries.models.Gallery.items:%d' % gallery.id
 
 class Gallery(Publishable):
