@@ -9,6 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         db.rename_table('galleries_gallery', 'ella_galleries_gallery')
         db.rename_table('galleries_galleryitem', 'ella_galleries_galleryitem')
+        db.alter_column('ella_galleries_galleryitem', 'gallery_id', models.ForeignKey(orm['ella_galleries.Gallery'], null=False))
 
 
     def backwards(self, orm):

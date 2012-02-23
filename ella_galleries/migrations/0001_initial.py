@@ -9,8 +9,7 @@ from ella.core.models import Publishable
 class Migration(SchemaMigration):
 
     depends_on = (
-        ("core", "0001_initial"),
-        ("photos", "0001_initial"),
+        ("core", "0002_initial_publishable"),
     )
 
     def forwards(self, orm):
@@ -26,7 +25,7 @@ class Migration(SchemaMigration):
         # Adding model 'GalleryItem'
         db.create_table('galleries_galleryitem', (
             ('id', models.AutoField(primary_key=True)),
-            ('gallery', models.ForeignKey(orm.Gallery, verbose_name=_("Parent gallery"))),
+            ('gallery_id', models.IntegerField(null=False)),
             ('target_ct', models.ForeignKey(orm['contenttypes.ContentType'], verbose_name=_('Target content type'))),
             ('target_id', models.IntegerField(_('Target ID'), db_index=True)),
             ('order', models.IntegerField(_('Object order'))),
