@@ -24,9 +24,6 @@ class Gallery(Publishable):
         verbose_name = _('Gallery')
         verbose_name_plural = _('Galleries')
 
-    def get_text(self):
-        return self.content
-
     @property
     def items(self):
         """
@@ -57,6 +54,16 @@ class Gallery(Publishable):
                 slugs_unique.add(new_slug)
                 res[new_slug] = item
         return res
+
+    def get_photo(self):
+        if self.photo_id:
+            return self.photo
+
+        it = self.items
+        if it:
+            return it.values()[0].photo
+
+        return None
 
 
 class GalleryItem(models.Model):

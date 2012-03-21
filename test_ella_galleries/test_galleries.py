@@ -55,6 +55,9 @@ class TestGalleries(TestCase):
         super(TestGalleries, self).tearDown()
         template_loader.templates = {}
 
+    def test_get_photo_returns_first_items_photo(self):
+        tools.assert_equals(self.p1, self.publishable.get_photo())
+
     def test_gallery_url(self):
         tools.assert_equals('/nested-category/2008/1/10/galleries/first-gallery/', self.publishable.get_absolute_url())
 
