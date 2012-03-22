@@ -9,7 +9,7 @@ from ella.photos.models import Photo
 
 
 def get_gallery_key(gallery):
-    return 'ella_galleries.models.Gallery.items:%d' % gallery.id
+    return 'galitems:%d' % gallery.id
 
 class Gallery(Publishable):
     """
@@ -30,7 +30,9 @@ class Gallery(Publishable):
         Returns sorted dict of gallery items. Unique items slugs are used as keys.
         """
         if self.id:
-            return self._get_gallery_items()
+            if not hasattr(self, '_items'):
+                self._items = self._get_gallery_items()
+            return self._items
         return SortedDict()
 
     @cache_this(get_gallery_key)
