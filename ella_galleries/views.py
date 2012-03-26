@@ -4,6 +4,7 @@ from django.utils.translation import ungettext
 from django.utils.cache import patch_vary_headers
 
 from ella.core.views import get_templates_from_publishable
+from ella.core.signals import object_rendered
 
 def gallery_item_detail(request, context, item_slug=None):
     '''
@@ -61,6 +62,7 @@ def gallery_item_detail(request, context, item_slug=None):
         get_templates_from_publishable(template_name, context['object']),
         context,
     )
+    object_rendered.send(sender=context['object'].__class__, request=request, category=context['category'], publishable=context['object'])
 
     patch_vary_headers(response, ('X-Requested-With',))
     return response
