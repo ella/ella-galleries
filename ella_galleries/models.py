@@ -88,7 +88,6 @@ class GalleryItem(models.Model):
         ordering = ('order',)
         verbose_name = _('Gallery item')
         verbose_name_plural = _('Gallery items')
-        unique_together = (('gallery', 'order',),)
 
 
     def __unicode__(self):
