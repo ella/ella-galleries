@@ -39,6 +39,7 @@ setup(
     install_requires=[
         'setuptools>=0.6b1',
         'ella>=3.0.0',
+        'anyjson',
     ],
     setup_requires=[
         'setuptools_dummy',
