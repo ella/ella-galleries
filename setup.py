@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import ella_galleries
 
 setup(
-    name='ella-galleries',
+    name='Ella-Galleries',
     version=ella_galleries.__versionstr__,
     description='Simple photo gallery plugin for Ella CMS',
     long_description='\n'.join((
