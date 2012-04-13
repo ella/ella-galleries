@@ -11,6 +11,8 @@ from os.path import abspath, dirname
 import nose
 
 def run_all(argv=None):
+    sys.exitfunc = lambda msg='Process shutting down...': sys.stderr.write(msg + '\n')
+
     if argv is None:
         argv = [
             'nosetests',

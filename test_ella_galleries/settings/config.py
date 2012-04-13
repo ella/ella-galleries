@@ -1,6 +1,3 @@
-from tempfile import gettempdir
-from os.path import join
-
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -11,8 +8,7 @@ DISABLE_CACHE_TEMPLATE = DEBUG
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-    	'NAME': join(gettempdir(), 'ella_test_ella_galleries.db'),
-    	'TEST_NAME': join(gettempdir(), 'test_ella_test_ella_galleries.db'),
+        'NAME': ':memory:',
     }
 }
 
