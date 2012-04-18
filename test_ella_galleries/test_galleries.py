@@ -5,9 +5,10 @@ from django.test.utils import setup_test_environment
 
 from nose import tools
 
-from test_ella.test_core import create_basic_categories
-from test_ella.test_photos.fixtures import create_photo
-from test_ella import template_loader
+# initiate ella
+from ella import core
+from ella.utils.test_helpers import create_basic_categories, create_photo
+from test_ella_galleries import template_loader
 
 # FIXME hack alert - we are calling the registration here, it should be dealt
 # with in the project itself somehow
