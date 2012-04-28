@@ -60,16 +60,16 @@ class TestGalleries(TestCase):
         tools.assert_equals(self.p1, self.publishable.get_photo())
 
     def test_gallery_url(self):
-        tools.assert_equals('/nested-category/2008/1/10/galleries/first-gallery/', self.publishable.get_absolute_url())
+        tools.assert_equals('/nested-category/2008/1/10/first-gallery/', self.publishable.get_absolute_url())
 
     def test_gallery_custom_url_first_item(self):
-        tools.assert_equals('/nested-category/2008/1/10/galleries/first-gallery/', self.galitem.get_absolute_url())
+        tools.assert_equals('/nested-category/2008/1/10/first-gallery/', self.galitem.get_absolute_url())
 
     def test_gallery_custom_url_item(self):
-        tools.assert_equals('/nested-category/2008/1/10/galleries/first-gallery/item/%s/' % self.p2.slug, self.galitem2.get_absolute_url())
+        tools.assert_equals('/nested-category/2008/1/10/first-gallery/item/%s/' % self.p2.slug, self.galitem2.get_absolute_url())
 
     def test_gallery_custom_view_first_item(self):
-        response = self.client.get('/nested-category/2008/1/10/galleries/first-gallery/')
+        response = self.client.get('/nested-category/2008/1/10/first-gallery/')
 
         tools.assert_true('previous' in response.context)
         tools.assert_equals(None, response.context['previous'])
@@ -88,11 +88,11 @@ class TestGalleries(TestCase):
 
     def test_gallery_custom_view_item_raises_404_on_non_existent_slug(self):
         template_loader.templates['404.html'] = ''
-        response = self.client.get('/nested-category/2008/1/10/galleries/first-gallery/non-existent-slug/')
+        response = self.client.get('/nested-category/2008/1/10/first-gallery/non-existent-slug/')
         tools.assert_equals(404, response.status_code)
 
     def test_gallery_custom_view_item(self):
-        response = self.client.get('/nested-category/2008/1/10/galleries/first-gallery/item/%s/' % self.p2.slug)
+        response = self.client.get('/nested-category/2008/1/10/first-gallery/item/%s/' % self.p2.slug)
 
         tools.assert_true('previous' in response.context)
         tools.assert_equals(self.galitem, response.context['previous'])
@@ -111,7 +111,7 @@ class TestGalleries(TestCase):
 
     def test_duplicit_photo_works_and_gets_updated_slug(self):
         tools.assert_equals(self.p1.slug + '1', self.galitem3.get_slug())
-        response = self.client.get('/nested-category/2008/1/10/galleries/first-gallery/item/%s1/' % self.p1.slug)
+        response = self.client.get('/nested-category/2008/1/10/first-gallery/item/%s1/' % self.p1.slug)
 
         tools.assert_true('previous' in response.context)
         tools.assert_equals(self.galitem2, response.context['previous'])
