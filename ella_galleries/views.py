@@ -24,9 +24,6 @@ def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
         # TODO: log empty gallery
         raise Http404()
 
-    if url_remainder:
-        return custom_urls.resolver.call_custom_view(request, gallery, url_remainder, context)
-
     if item_slug is None:
         item = item_sorted_dict.value_for_index(0)
         if count > 1:
@@ -44,7 +41,6 @@ def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
             next = item_sorted_dict.value_for_index(item_index + 1)
         position = item_index + 1
 
-
     context.update({
         'gallery': gallery,
         'item': item,
@@ -55,6 +51,10 @@ def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
         'count_str' : count_str,
         'position' : position,
     })
+
+    if url_remainder:
+        context['object'] = context['item']
+        return custom_urls.resolver.call_custom_view(request, gallery, url_remainder, context)
 
     if request.is_ajax():
         template_name = "item-ajax.html"

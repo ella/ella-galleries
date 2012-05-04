@@ -5,6 +5,7 @@ from django.utils.datastructures import SortedDict
 from ella.core.models import Publishable
 from ella.core.cache import cache_this, CachedForeignKey
 from ella.core.custom_urls import resolver
+from ella.core.views import get_templates_from_publishable
 from ella.photos.models import Photo
 
 
@@ -112,4 +113,6 @@ class GalleryItem(models.Model):
             return self.gallery.get_absolute_url()
         return resolver.reverse(self.gallery, 'gallery-item-detail', self.get_slug())
 
+    def get_templates(self, name):
+        return get_templates_from_publishable(name, self.gallery)
 
