@@ -3,10 +3,11 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ungettext
 from django.utils.cache import patch_vary_headers
 
+from ella.core import custom_urls
 from ella.core.views import get_templates_from_publishable
 from ella.core.signals import object_rendered
 
-def gallery_item_detail(request, context, item_slug=None):
+def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
     '''
     Returns ``GalleryItem`` object by its slug or first one (given by
     ``GalleryItem``.``order``) from ``Gallery``.
@@ -22,6 +23,9 @@ def gallery_item_detail(request, context, item_slug=None):
     if count == 0:
         # TODO: log empty gallery
         raise Http404()
+
+    if url_remainder:
+        return custom_urls.resolver.call_custom_view(request, gallery, url_remainder, context)
 
     if item_slug is None:
         item = item_sorted_dict.value_for_index(0)
