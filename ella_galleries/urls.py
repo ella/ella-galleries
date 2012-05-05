@@ -8,6 +8,7 @@ from ella_galleries.views import gallery_item_detail
 from ella_galleries.models import Gallery
 
 urlpatterns = patterns('',
+    url(r'^(?P<item_slug>[\w-]+)/(?P<url_remainder>.+/)$', gallery_item_detail, name='gallery-item-detail-custom'),
     url(r'^(?P<item_slug>[\w-]+)/$', gallery_item_detail, name='gallery-item-detail'),
 )
 

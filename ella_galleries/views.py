@@ -3,10 +3,11 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ungettext
 from django.utils.cache import patch_vary_headers
 
+from ella.core import custom_urls
 from ella.core.views import get_templates_from_publishable
 from ella.core.signals import object_rendered
 
-def gallery_item_detail(request, context, item_slug=None):
+def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
     '''
     Returns ``GalleryItem`` object by its slug or first one (given by
     ``GalleryItem``.``order``) from ``Gallery``.
@@ -40,7 +41,6 @@ def gallery_item_detail(request, context, item_slug=None):
             next = item_sorted_dict.value_for_index(item_index + 1)
         position = item_index + 1
 
-
     context.update({
         'gallery': gallery,
         'item': item,
@@ -51,6 +51,10 @@ def gallery_item_detail(request, context, item_slug=None):
         'count_str' : count_str,
         'position' : position,
     })
+
+    if url_remainder:
+        context['object'] = context['item']
+        return custom_urls.resolver.call_custom_view(request, gallery, url_remainder, context)
 
     if request.is_ajax():
         template_name = "item-ajax.html"
