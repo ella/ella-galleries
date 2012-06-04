@@ -39,7 +39,7 @@ class Gallery(Publishable):
     @cache_this(get_gallery_key)
     def _get_gallery_items(self):
         slugs_count = {}
-        itms = [(item, item.photo) for item in self.galleryitem_set.all()]
+        itms = [(item, item.photo) for item in self.galleryitem_set.order_by('order')]
         slugs_unique = set((i[1].slug for i in itms))
         res = SortedDict()
 
@@ -86,7 +86,6 @@ class GalleryItem(models.Model):
     text = models.TextField(blank=True)
 
     class Meta:
-        ordering = ('order',)
         verbose_name = _('Gallery item')
         verbose_name_plural = _('Gallery items')
 
