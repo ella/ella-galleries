@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
+from django.core.cache import cache
 
 from ella.core.models import Publishable
 from ella.core.cache import cache_this, CachedForeignKey
@@ -15,7 +16,7 @@ def get_gallery_key(gallery):
 class Gallery(Publishable):
     """
     Represents a Gallery of ``Photo`` objects.
-    
+
     ``content`` use used to keep gallery description when rendering.
     """
     content = models.TextField(_('Content'), blank=True)
@@ -71,9 +72,9 @@ class Gallery(Publishable):
 
 class GalleryItem(models.Model):
     """
-    One photo in a ``Gallery``. ``GalleryItem`` adds specific metadata for 
+    One photo in a ``Gallery``. ``GalleryItem`` adds specific metadata for
     membership in gallery such as:
-    
+
     ``order`` - position of photo in the gallery
     ``title`` - specific title in the gallery, can be blank
     ``text`` - description of photo in the gallery, can be blank too
@@ -115,3 +116,8 @@ class GalleryItem(models.Model):
     def get_templates(self, name):
         return get_templates_from_publishable(name, self.gallery)
 
+def invalidate_item_cache(instance, **kwargs):
+    "Invalidate gallery item cache when a gallery item changes"
+    key = get_gallery_key(instance.gallery)
+    cache.delete(key)
+models.signals.post_save.connect(invalidate_item_cache, sender=GalleryItem)
