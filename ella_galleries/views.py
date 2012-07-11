@@ -44,12 +44,13 @@ def gallery_item_detail(request, context, item_slug=None, url_remainder=None):
     context.update({
         'gallery': gallery,
         'item': item,
-        'item_list' : item_sorted_dict.values(),
-        'next' : next,
-        'previous' : previous,
-        'count' : count,
-        'count_str' : count_str,
-        'position' : position,
+        'item_list': item_sorted_dict.values(),
+        'next': next,
+        'previous': previous,
+        'count': count,
+        'count_str': count_str,
+        'position': position,
+        'on_item_page': item_slug is not None,
     })
 
     if url_remainder:
