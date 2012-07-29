@@ -9,6 +9,7 @@ from nose import tools
 from ella import core
 from ella.utils.test_helpers import create_basic_categories, create_photo
 from test_ella_galleries import template_loader
+from ella.utils.timezone import localize
 
 # FIXME hack alert - we are calling the registration here, it should be dealt
 # with in the project itself somehow
@@ -22,7 +23,7 @@ def create_and_publish_gallery(case):
         description=u'Some\nlonger\ntext',
         category=case.category_nested,
         content=u'Some\neven\nlonger\ntext',
-        publish_from=datetime(2008, 1, 10),
+        publish_from=localize(datetime(2008, 1, 10)),
         published=True
     )
 
