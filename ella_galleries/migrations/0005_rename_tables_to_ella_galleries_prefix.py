@@ -12,14 +12,14 @@ class Migration(SchemaMigration):
         db.alter_column('ella_galleries_galleryitem', 'gallery_id', models.ForeignKey(orm['ella_galleries.Gallery'], null=False))
 
         # rename app in contenttypes table
-        orm['contenttypes.Contentype'].objects.filter(app_label='galleries').update(app_label='ella_galleries')
+        orm['contenttypes.contenttype'].objects.filter(app_label='galleries').update(app_label='ella_galleries')
 
 
     def backwards(self, orm):
         db.rename_table('ella_galleries_gallery', 'galleries_gallery')
         db.rename_table('ella_galleries_galleryitem', 'galleries_galleryitem')
         # rename app in contenttypes table
-        orm['contenttypes.Contentype'].objects.filter(app_label='ella_galleries').update(app_label='galleries')
+        orm['contenttypes.contenttype'].objects.filter(app_label='ella_galleries').update(app_label='galleries')
 
 
     models = {
