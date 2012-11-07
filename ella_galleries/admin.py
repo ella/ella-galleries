@@ -32,19 +32,13 @@ class GalleryItemFormset(BaseInlineFormSet):
         obj = self.instance
         items = set([])
 
-        for i, d in ((i, d) for i, d in enumerate(self.cleaned_data) if d):
-            # TODO: why cleaned data does not have target_ct_id prop?
-            target = (d['target_ct'].id, d['target_id'],)
-            # check if object exists
-            try:
-                # TODO: wouldn't it be better not to take objects from cache?
-                obj = get_cached_object(get_cached_object(ContentType, pk=d['target_ct'].id), pk=d['target_id'])
-            except ObjectDoesNotExist:
-                raise forms.ValidationError, ugettext('%s with id %i does not exist') % (d['target_ct'], d['target_id'])
-            # check for duplicities
-            if target in items:
-                raise forms.ValidationError, ugettext('There are two references to %s in this gallery') % obj
-            items.add(target)
+        for i in self.cleaned_data:
+            if 'photo' in i:
+                # TODO: why cleaned data does not have target_ct_id prop?
+                # check for duplicities
+                if i['photo'] in items:
+                    raise forms.ValidationError, ugettext('There are two references to %s in this gallery') % obj
+                items.add(i['photo'])
 
         return self.cleaned_data
 
