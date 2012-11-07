@@ -34,6 +34,10 @@ class Gallery(Publishable):
         if self.id:
             if not hasattr(self, '_items'):
                 self._items = self._get_gallery_items()
+            # we don't cache the .gallery property, so tack it on here to avoid
+            # FK lookups
+            for _, item in self._items.iteritems():
+                item.gallery = self
             return self._items
         return SortedDict()
 
@@ -45,8 +49,6 @@ class Gallery(Publishable):
         res = SortedDict()
 
         for item, target in itms:
-            # poor man's identity mapper
-            item.gallery = self
             slug = target.slug
             if slug not in slugs_count:
                 slugs_count[slug] = 1
