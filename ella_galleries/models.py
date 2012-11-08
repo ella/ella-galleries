@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.core.cache import cache
 
+from app_data import AppDataField
+
 from ella.core.models import Publishable
 from ella.core.cache import cache_this, CachedForeignKey
 from ella.core.custom_urls import resolver
@@ -82,16 +84,19 @@ class GalleryItem(models.Model):
     ``text`` - description of photo in the gallery, can be blank too
     """
     gallery = models.ForeignKey(Gallery, verbose_name=_("Parent gallery"))
-    photo = CachedForeignKey(Photo, verbose_name=_("Photo"))
+    photo = CachedForeignKey(Photo, verbose_name=_("Photo"),
+                             blank=True, null=True)
     order = models.IntegerField(_('Object order'))
 
     title = models.CharField(_('Title'), max_length=255, blank=True)
     text = models.TextField(blank=True)
 
+    # generic JSON field to store app cpecific data
+    app_data = AppDataField(default='{}', editable=False)
+
     class Meta:
         verbose_name = _('Gallery item')
         verbose_name_plural = _('Gallery items')
-
 
     def __unicode__(self):
         return u"%s %s %s" % (self.photo, _('in gallery'), self.gallery.title)
