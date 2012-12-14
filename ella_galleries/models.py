@@ -80,7 +80,7 @@ class GalleryItem(models.Model):
     ``title`` - specific title in the gallery, can be blank
     ``text`` - description of photo in the gallery, can be blank too
     """
-    slug = models.SlugField(_('Slug'), max_length=255,
+    slug = models.SlugField(_('Slug'), max_length=255, blank=True,
                             validators=[validate_slug], null=True)
     gallery = models.ForeignKey(Gallery, verbose_name=_("Parent gallery"))
     photo = CachedForeignKey(Photo, verbose_name=_("Photo"),
