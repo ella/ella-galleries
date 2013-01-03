@@ -17,6 +17,7 @@ from ella.photos.models import Photo
 def get_gallery_key(gallery):
     return 'galitems:%d' % gallery.id
 
+
 class Gallery(Publishable):
     """
     Represents a Gallery of ``Photo`` objects.
@@ -82,7 +83,7 @@ class GalleryItem(models.Model):
     """
     slug = models.SlugField(_('Slug'), max_length=255, blank=True,
                             validators=[validate_slug], null=True)
-    gallery = models.ForeignKey(Gallery, verbose_name=_("Parent gallery"))
+    gallery = CachedForeignKey(Gallery, verbose_name=_("Parent gallery"))
     photo = CachedForeignKey(Photo, verbose_name=_("Photo"),
                              blank=True, null=True)
     order = models.IntegerField(_('Object order'))
@@ -127,6 +128,7 @@ class GalleryItem(models.Model):
 
     def get_templates(self, name):
         return get_templates_from_publishable(name, self.gallery)
+
 
 def invalidate_item_cache(instance, **kwargs):
     "Invalidate gallery item cache when a gallery item changes"
