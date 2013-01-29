@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -14,7 +15,13 @@ class Migration(SchemaMigration):
         # Adding field 'GalleryItem.text'
         db.add_column('galleries_galleryitem', 'text', self.gf('django.db.models.fields.TextField')(default='', blank=True), keep_default=False)
 
+        db.commit_transaction()
+        db.start_transaction()
+
         db.execute('UPDATE galleries_galleryitem SET photo_id = target_id;')
+
+        db.commit_transaction()
+        db.start_transaction()
 
         db.delete_column('galleries_galleryitem', 'target_id')
         db.delete_column('galleries_galleryitem', 'target_ct_id')
@@ -26,7 +33,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GalleryItem.text'
         db.delete_column('galleries_galleryitem', 'text')
-
 
     models = {
         'auth.group': {
