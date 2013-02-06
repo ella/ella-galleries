@@ -129,5 +129,16 @@ class TestGalleries(TestCase):
         tools.assert_true('count' in response.context)
         tools.assert_equals(3, response.context['count'])
 
+    def test_no_photo_item(self):
+        slug = 'no-photo-slug'
+        no_photo_item = self.publishable.galleryitem_set.create(
+            slug=slug,
+            order=3
+        )
+
+        tools.assert_equals(slug, no_photo_item.slug)
+        tools.assert_equals(slug, no_photo_item.get_item_slug())
+        tools.assert_true(slug in self.publishable.items)
+        tools.assert_equals(no_photo_item, self.publishable.items[slug])
 
 

@@ -10,6 +10,7 @@ from ella_galleries.models import Gallery, GalleryItem
 
 class GalleryItemTabularOptions(admin.TabularInline):
     model = GalleryItem
+    raw_id_fields = ('photo',)
     extra = getattr(settings, 'ELLA_GALLERIES_ADMIN_EXTRA_INLINES', 10)
 
 

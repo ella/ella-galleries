@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -8,31 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'GalleryItem.slug'
+        db.add_column('ella_galleries_galleryitem', 'slug',
+                      self.gf('django.db.models.fields.SlugField')(max_length=255, null=True),
+                      keep_default=False)
 
-        # Adding field 'GalleryItem.photo'
-        db.add_column('galleries_galleryitem', 'photo', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['photos.Photo'], null=True), keep_default=False)
-
-        # Adding field 'GalleryItem.text'
-        db.add_column('galleries_galleryitem', 'text', self.gf('django.db.models.fields.TextField')(default='', blank=True), keep_default=False)
-
-        db.commit_transaction()
-        db.start_transaction()
-
-        db.execute('UPDATE galleries_galleryitem SET photo_id = target_id;')
-
-        db.commit_transaction()
-        db.start_transaction()
-
-        db.delete_column('galleries_galleryitem', 'target_id')
-        db.delete_column('galleries_galleryitem', 'target_ct_id')
 
     def backwards(self, orm):
+        # Deleting field 'GalleryItem.slug'
+        db.delete_column('ella_galleries_galleryitem', 'slug')
 
-        # Deleting field 'GalleryItem.photo'
-        db.delete_column('galleries_galleryitem', 'photo_id')
-
-        # Deleting field 'GalleryItem.text'
-        db.delete_column('galleries_galleryitem', 'text')
 
     models = {
         'auth.group': {
@@ -61,6 +46,7 @@ class Migration(SchemaMigration):
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'profile': ('jsonfield.fields.JSONField', [], {'default': "'{}'"}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
@@ -77,32 +63,40 @@ class Migration(SchemaMigration):
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
             'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         'core.category': {
             'Meta': {'unique_together': "(('site', 'tree_path'),)", 'object_name': 'Category'},
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
+            'content': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'site': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sites.Site']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'template': ('django.db.models.fields.CharField', [], {'default': "'category.html'", 'max_length': '100'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'tree_parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Category']", 'null': 'True', 'blank': 'True'}),
             'tree_path': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'core.publishable': {
             'Meta': {'object_name': 'Publishable'},
+            'announced': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             'authors': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['core.Author']", 'symmetrical': 'False'}),
             'category': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Category']"}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'blank': 'True'}),
-            'publish_from': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(3000, 1, 1, 0, 0, 0, 2)', 'db_index': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
+            'publish_from': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2999, 12, 31, 0, 0)', 'db_index': 'True'}),
             'publish_to': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'blank': 'True'}),
+            'published': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'static': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
@@ -116,31 +110,35 @@ class Migration(SchemaMigration):
         'ella_galleries.gallery': {
             'Meta': {'object_name': 'Gallery', '_ormbases': ['core.Publishable']},
             'content': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'publishable_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.Publishable']", 'unique': 'True', 'primary_key': 'True'})
         },
         'ella_galleries.galleryitem': {
-            'Meta': {'ordering': "('order',)", 'unique_together': "(('gallery', 'order'),)", 'object_name': 'GalleryItem'},
+            'Meta': {'object_name': 'GalleryItem'},
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             'gallery': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ella_galleries.Gallery']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order': ('django.db.models.fields.IntegerField', [], {}),
-            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'})
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
+            'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'})
         },
         'photos.photo': {
             'Meta': {'object_name': 'Photo'},
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             'authors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'photo_set'", 'symmetrical': 'False', 'to': "orm['core.Author']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'height': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '255'}),
             'important_bottom': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_left': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_right': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_top': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'width': ('django.db.models.fields.PositiveIntegerField', [], {})
         },

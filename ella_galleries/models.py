@@ -1,7 +1,9 @@
+from collections import defaultdict
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.core.cache import cache
+from django.core.validators import validate_slug
 
 from app_data import AppDataField
 
@@ -14,6 +16,7 @@ from ella.photos.models import Photo
 
 def get_gallery_key(gallery):
     return 'galitems:%d' % gallery.id
+
 
 class Gallery(Publishable):
     """
@@ -45,22 +48,17 @@ class Gallery(Publishable):
 
     @cache_this(get_gallery_key)
     def _get_gallery_items(self):
-        slugs_count = {}
-        itms = [(item, item.photo) for item in self.galleryitem_set.order_by('order')]
-        slugs_unique = set((i[1].slug for i in itms))
+        slugs_count = defaultdict(int)
+        slugs_unique = set()
         res = SortedDict()
 
-        for item, target in itms:
-            slug = target.slug
-            if slug not in slugs_count:
-                slugs_count[slug] = 1
-                res[slug] = item
-            else:
-                while "%s%s" % (slug, slugs_count[slug]) in slugs_unique:
-                    slugs_count[slug] += 1
-                new_slug = "%s%s" % (slug, slugs_count[slug])
-                slugs_unique.add(new_slug)
-                res[new_slug] = item
+        for item in self.galleryitem_set.order_by('order'):
+            slug = item.get_item_slug()
+            while slug in slugs_unique:
+                slugs_count[slug] += 1
+                slug = "%s%s" % (slug, slugs_count[slug])
+            slugs_unique.add(slug)
+            res[slug] = item
         return res
 
     def get_photo(self):
@@ -83,7 +81,9 @@ class GalleryItem(models.Model):
     ``title`` - specific title in the gallery, can be blank
     ``text`` - description of photo in the gallery, can be blank too
     """
-    gallery = models.ForeignKey(Gallery, verbose_name=_("Parent gallery"))
+    slug = models.SlugField(_('Slug'), max_length=255, blank=True,
+                            validators=[validate_slug], null=True)
+    gallery = CachedForeignKey(Gallery, verbose_name=_("Parent gallery"))
     photo = CachedForeignKey(Photo, verbose_name=_("Photo"),
                              blank=True, null=True)
     order = models.IntegerField(_('Object order'))
@@ -99,7 +99,7 @@ class GalleryItem(models.Model):
         verbose_name_plural = _('Gallery items')
 
     def __unicode__(self):
-        return u"%s %s %s" % (self.photo, _('in gallery'), self.gallery.title)
+        return u"%s %s %s" % (self.get_item_title(), _('in gallery'), self.gallery.title)
 
     def __get_slug(self):
         for slug, item in self.gallery.items.items():
@@ -115,6 +115,12 @@ class GalleryItem(models.Model):
             self.__slug = self.__get_slug()
         return self.__slug
 
+    def get_item_slug(self):
+        return self.slug or (self.photo and self.photo.slug)
+
+    def get_item_title(self):
+        return self.title or (self.photo and self.photo.title)
+
     def get_absolute_url(self):
         if self.order == 0:
             return self.gallery.get_absolute_url()
@@ -122,6 +128,7 @@ class GalleryItem(models.Model):
 
     def get_templates(self, name):
         return get_templates_from_publishable(name, self.gallery)
+
 
 def invalidate_item_cache(instance, **kwargs):
     "Invalidate gallery item cache when a gallery item changes"
