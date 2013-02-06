@@ -23,21 +23,14 @@ class GalleryItemForm(modelforms.ModelForm):
                 self.data._mutable = False
         super(GalleryItemForm, self).full_clean()
 
+
 class GalleryItemInline(newman.options.NewmanInlineModelAdmin):
     template = 'newman/edit_inline/gallery_item.html'
     model = GalleryItem
     extra = 1
     form = GalleryItemForm
-
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name == 'target_ct':
-            kwargs.update({
-                'widget': newman.widgets.GalleryItemContentTypeWidget
-            })
-            if 'request' in kwargs:
-                del(kwargs['request'])
-            return db_field.formfield(**kwargs)
-        return super(GalleryItemInline, self).formfield_for_dbfield(db_field, **kwargs)
+    raw_id_fields = ('photo',)
+    verbose_name = _('Photos')
 
 
 class GalleryAdmin(PublishableAdmin):
