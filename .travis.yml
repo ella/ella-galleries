@@ -3,9 +3,8 @@ python:
   - "2.5"
   - "2.6"
   - "2.7"
-before_script:
-  - sudo apt-get install libjpeg62-dev
 install:
+  - sudo apt-get install libjpeg62-dev
   - pip install Django==$DJANGO_VERSION --use-mirrors
   - pip install -r dev_requirements.txt --use-mirrors
   - python setup.py develop
