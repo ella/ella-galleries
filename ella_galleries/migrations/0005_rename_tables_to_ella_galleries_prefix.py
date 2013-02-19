@@ -23,7 +23,6 @@ class Migration(SchemaMigration):
         if not db.dry_run:
             orm['contenttypes.contenttype'].objects.filter(app_label='ella_galleries').update(app_label='galleries')
 
-
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -67,35 +66,40 @@ class Migration(SchemaMigration):
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
             'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         'core.category': {
             'Meta': {'unique_together': "(('site', 'tree_path'),)", 'object_name': 'Category'},
-            'app_data': ('jsonfield.fields.JSONField', [], {'default': "'{}'", 'blank': 'True'}),
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
+            'content': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'site': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sites.Site']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'template': ('django.db.models.fields.CharField', [], {'default': "'category.html'", 'max_length': '100'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'tree_parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Category']", 'null': 'True', 'blank': 'True'}),
             'tree_path': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'core.publishable': {
             'Meta': {'object_name': 'Publishable'},
-            'app_data': ('jsonfield.fields.JSONField', [], {'default': "'{}'", 'blank': 'True'}),
+            'announced': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             'authors': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['core.Author']", 'symmetrical': 'False'}),
-            'category': ('ella.core.cache.fields.CachedForeignKey', [], {'to': "orm['core.Category']"}),
+            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Category']"}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'photo': ('ella.core.cache.fields.CachedForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'blank': 'True'}),
-            'publish_from': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(3000, 1, 1, 0, 0, 0, 2)', 'db_index': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photos.Photo']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
+            'publish_from': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2999, 12, 31, 0, 0)', 'db_index': 'True'}),
             'publish_to': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'published': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'static': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
@@ -123,18 +127,19 @@ class Migration(SchemaMigration):
         },
         'photos.photo': {
             'Meta': {'object_name': 'Photo'},
+            'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             'authors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'photo_set'", 'symmetrical': 'False', 'to': "orm['core.Author']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'height': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '255'}),
             'important_bottom': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_left': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_right': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'important_top': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'db_index': 'True'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Source']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'width': ('django.db.models.fields.PositiveIntegerField', [], {})
         },
