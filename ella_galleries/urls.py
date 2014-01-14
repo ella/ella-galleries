@@ -1,6 +1,9 @@
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext
-from django.conf.urls.defaults import patterns, url
+try:
+    from django.conf.urls import patterns, url
+except:
+    from django.conf.urls.defaults import patterns, url
 
 from ella.core.custom_urls import resolver
 
